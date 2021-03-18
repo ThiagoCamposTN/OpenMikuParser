@@ -1,36 +1,33 @@
 class_name Parsers
 
 class VmdParser:
-	var vmd_object
-	
-	func _init():
-		vmd_object = Objects.VmdObject.new()
-		
-	func open(file_name):
+	static func parse_file(file_path):
 		var file = File.new()
-		file.open(file_name, File.READ)
-		self.parse_data(file)
+		file.open(file_path, File.READ)
+		var vmd_object = VmdParser.parse_file_data(file)
 		file.close()
 		
 		return vmd_object
 	
-	func parse_data(file):
-		vmd_object.signature 	= self.get_signature(file)
-		vmd_object.model_name 	= self.get_model_name(file)
-		vmd_object.motions		= self.get_bone_keyframes(file)
-		vmd_object.shapes		= self.get_face_keyframes(file)
-		vmd_object.cameras		= self.get_camera_keyframes(file)
-		vmd_object.lights		= self.get_light_keyframes(file)
-		vmd_object.shadows		= self.get_shadow_keyframes(file)
-		vmd_object.ikdisps		= self.get_ikdisp_keyframes(file)
+	static func parse_file_data(file):
+		var vmd_object = Objects.VmdObject.new()
+		vmd_object.signature 	= VmdParser.get_signature(file)
+		vmd_object.model_name 	= VmdParser.get_model_name(file, vmd_object.signature)
+		vmd_object.motions		= VmdParser.get_bone_keyframes(file)
+		vmd_object.shapes		= VmdParser.get_face_keyframes(file)
+		vmd_object.cameras		= VmdParser.get_camera_keyframes(file)
+		vmd_object.lights		= VmdParser.get_light_keyframes(file)
+		vmd_object.shadows		= VmdParser.get_shadow_keyframes(file)
+		vmd_object.ikdisps		= VmdParser.get_ikdisp_keyframes(file)
+		return vmd_object
 	
-	func get_signature(file):
+	static func get_signature(file):
 		"""
 		reads the signature, that contains the current version (30 bytes)
 		"""
 		return Utils.get_bytes(file, 30, Utils.BYTES_TYPE.UTF8)
 		
-	func get_model_name(file):
+	static func get_model_name(file, signature):
 		"""
 		reads the target model name, can have different sizes (10 or 20 bytes)
 		"""
@@ -39,16 +36,16 @@ class VmdParser:
 		# if version 2, then it's 20 bytes
 		var data
 		
-		if vmd_object.signature == "Vocaloid Motion Data file":
+		if signature == "Vocaloid Motion Data file":
 			data = Utils.get_bytes(file, 10)
-		elif vmd_object.signature == "Vocaloid Motion Data 0002":
+		elif signature == "Vocaloid Motion Data 0002":
 			data = Utils.get_bytes(file, 20)
 		else:
 			assert(false, "ERROR: Invalid VMD version.")
 		
-		return self.read_cp932_text(data)
+		return VmdParser.read_cp932_text(data)
 		
-	func read_cp932_text(data):
+	static func read_cp932_text(data):
 		# reading Shift JIS formatted string
 		var substring = PoolByteArray()
 		
@@ -59,7 +56,7 @@ class VmdParser:
 			
 		return substring
 	
-	func get_bone_keyframes(file):
+	static func get_bone_keyframes(file):
 		"""
 		reads the bone keyframe list (111 bytes)
 		"""
@@ -100,7 +97,7 @@ class VmdParser:
 			
 		return frames
 		
-	func get_face_keyframes(file):
+	static func get_face_keyframes(file):
 		"""
 		reads the face keyframe list (23 bytes)
 		"""
@@ -118,7 +115,7 @@ class VmdParser:
 		
 		return frames
 	
-	func get_camera_keyframes(file):
+	static func get_camera_keyframes(file):
 		"""
 		reads the camera keyframe list (61 bytes)
 		"""
@@ -162,7 +159,7 @@ class VmdParser:
 		
 		return frames
 	
-	func get_light_keyframes(file):
+	static func get_light_keyframes(file):
 		"""
 		reads the light keyframe list (28 bytes)
 		"""
@@ -182,7 +179,7 @@ class VmdParser:
 		
 		return frames
 	
-	func get_shadow_keyframes(file):
+	static func get_shadow_keyframes(file):
 		var keyframes = Utils.get_bytes(file, 1, Utils.BYTES_TYPE.UINT32)
 		var frames = []
 		
@@ -195,7 +192,7 @@ class VmdParser:
 		
 		return frames
 	
-	func get_ikdisp_keyframes(file):
+	static func get_ikdisp_keyframes(file):
 		var keyframes = Utils.get_bytes(file, 1, Utils.BYTES_TYPE.UINT32)
 		var frames = []
 		
