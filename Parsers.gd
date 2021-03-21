@@ -202,7 +202,7 @@ class VmdParser:
 			var ik_bones_length				= Utils.get_bytes(file, 1, Utils.BYTES_TYPE.UINT32)
 			var ik_bones = []
 			
-			for _j in range(ik_bones):
+			for _j in range(ik_bones_length):
 				var bone_name 				= Utils.get_bytes(file, 20, Utils.BYTES_TYPE.CP932)
 				var inverse_kinematic_mode	= Utils.get_bytes(file, 1, Utils.BYTES_TYPE.UINT8)
 				ik_bones.append(Objects.InverseKinematicBone.new(bone_name, inverse_kinematic_mode))
