@@ -9,6 +9,16 @@ The knowledges used in this project were extracted from severals sources:
 日本語文字コード](http://charset.7jp.net/jis0208.html)
 * [ VMD file format - MikuMikuDance Wiki](https://mikumikudance.fandom.com/wiki/VMD_file_format)
 
+## Usage
+
+```GDScript
+var vmd_file_path   # set the variable value to the file path
+
+var vmd_object = Parsers.VmdParser.parse_file(vmd_file_path)
+
+print(vmd_object.get_model_name_in_utf8())
+```
+
 ## VMD file format specification
 
 Vocaloid Motion Data (VMD) file format specification
