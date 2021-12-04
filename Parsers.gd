@@ -43,18 +43,7 @@ class VmdParser:
 		else:
 			assert(false, "ERROR: Invalid VMD version.")
 		
-		return VmdParser.read_cp932_text(data)
-		
-	static func read_cp932_text(data):
-		# reading Shift JIS formatted string
-		var substring = PoolByteArray()
-		
-		for i in data:
-			if i == 0:
-				break
-			substring.append(i)
-			
-		return substring
+		return Utils.read_cp932_text(data)
 	
 	static func get_bone_keyframes(file):
 		"""
